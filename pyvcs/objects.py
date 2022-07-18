@@ -52,6 +52,7 @@ def find_object(obj_name: str, gitdir: pathlib.Path) -> str:
     # PUT YOUR CODE HERE
     ...
 
+
 def read_object(sha: str, gitdir: pathlib.Path) -> tp.Tuple[str, bytes]:
     obj_path = gitdir / "objects" / sha[:2] / sha[2:]
     with obj_path.open(mode="rb") as f:
@@ -62,6 +63,7 @@ def read_object(sha: str, gitdir: pathlib.Path) -> tp.Tuple[str, bytes]:
         fmt = str(header[:head_delimiter].decode("ascii"))
         decode_content = content[cont_delimiter + 1:]
     return (fmt, decode_content)
+
 
 def read_tree(data: bytes):
     shas_enc, data_without_sha_enc = pop_sha(data)
@@ -76,6 +78,7 @@ def read_tree(data: bytes):
     names = sep_data[1::2]
     return [permissions, shas, names]
 
+
 def pop_sha(data):
     shas = []
     zero_byte = data.find(b'\0')
@@ -85,6 +88,7 @@ def pop_sha(data):
         zero_byte = data.find(b'\0', zero_byte + 1)
 
     return shas, data
+
 
 def cat_file(obj_name: str, pretty: bool = True) -> None:
     gitdir = repo_find()
@@ -129,6 +133,7 @@ def find_all_files_from_commit_sha(gitdir: pathlib.Path, commit_sha:str):
         all_files = child_files
     return all_files
 
+
 def find_tree_files(gitdir: pathlib.Path, tree_sha:str, sub_obj_root: pathlib.Path) -> tp.Tuple[tp.List, tp.List]:
     tree_in_bytes = read_object(tree_sha, gitdir)[1]
     all_tree_files = []
@@ -143,15 +148,18 @@ def find_tree_files(gitdir: pathlib.Path, tree_sha:str, sub_obj_root: pathlib.Pa
             all_tree_files += deeper_files
     return (all_tree_files_sha, all_tree_files)
 
+
 def get_tree_content(gitdir, tree_sha):
     tree_in_bytes = read_object(tree_sha, gitdir)[1]
     sub_obj_permissions, sub_obj_shas, sub_obj_dir_names = read_tree(tree_in_bytes)
+
 
 def get_tree_sha_from_commit(gitdir: pathlib.Path, commit_sha: str):
     commit_in_bytes = read_object(commit_sha, gitdir)
     commit_decoded = commit_in_bytes[1].decode()
     tree_sha = commit_decoded.split("\n")[0].split(" ")[1]
     return tree_sha
+
 
 def find_commit_parent(gitdir: pathlib.Path, commit_sha: str):
     commit_in_bytes = read_object(commit_sha, gitdir)
@@ -160,6 +168,7 @@ def find_commit_parent(gitdir: pathlib.Path, commit_sha: str):
     if len(maybe_parent) == 40:
         return maybe_parent
     return None
+
 
 def get_tracked_files(gitdir: pathlib.Path):
     master_branch_path = gitdir / "refs" / "heads" / "master"
